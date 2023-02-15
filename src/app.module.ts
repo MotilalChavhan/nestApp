@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { UserModule } from './user/user.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from './user/user.model';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, 
-    SequelizeModule.forRoot({
+  imports: [
+		SequelizeModule.forRoot({
       dialect: 'postgres',
       host: 'localhost',
       port: 5432,
@@ -15,14 +15,12 @@ import { AuthModule } from './auth/auth.module';
       database: 'nest_db',
       autoLoadModels: true,
       synchronize: true,
-      define: {
-        defaultScope: {
-          attributes: {
-            exclude: ['hash']
-          }
-        }
-      }
-    }), AuthModule,
+    }),
+		ConfigModule.forRoot({
+			isGlobal: true
+		}),
+		UserModule,
+		AuthModule,
   ],
   controllers: [],
   providers: [],

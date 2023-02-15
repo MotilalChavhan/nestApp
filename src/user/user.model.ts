@@ -17,4 +17,8 @@ export class User extends Model {
 
   @Column({ defaultValue: true })
   isActive: boolean;
+
+  toJSON() {
+    return { ...this.get(), hash: undefined }
+  }
 }
