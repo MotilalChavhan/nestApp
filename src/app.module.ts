@@ -3,6 +3,9 @@ import { UserModule } from './user/user.module';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { PostModule } from './post/post.module';
+import { User } from './user/user.model';
+import { Post } from './post/post.model';
 
 @Module({
   imports: [
@@ -13,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
       username: 'test',
       password: 'root@123',
       database: 'nest_db',
+			models: [User, Post],
       autoLoadModels: true,
       synchronize: true,
     }),
@@ -21,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
 		}),
 		UserModule,
 		AuthModule,
+		PostModule,
   ],
   controllers: [],
   providers: [],

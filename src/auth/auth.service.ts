@@ -6,6 +6,8 @@ import * as argon from 'argon2';
 import { ValidationError } from 'sequelize';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { UserDto } from 'src/user/dto';
+import { Role } from 'src/user/enums';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +18,7 @@ export class AuthService {
 		private config: ConfigService,
 	) {}
 
-	async signup(dto: AuthDto) {
+	async signup(dto: UserDto) {
 		// generating hash of the password
 		const hash = await argon.hash(dto.password);
 		
@@ -24,10 +26,15 @@ export class AuthService {
 		try {
 			const user = await this.userModel.create({
 				email: dto.email,
-				hash
+				hash,
+				firstName: dto.firstName,
+				lastName: dto.lastName,
+				role: dto.role,
 			})
+
+			// console.log(dto.role);
 	
-			return this.signToken(user.id, user.email);
+			return this.signToken(user.id, user.email, user.role);
 		} catch (error) {
 			if (error instanceof ValidationError) {
 				throw new ForbiddenException("Credentials already taken");
@@ -49,7 +56,7 @@ export class AuthService {
 			throw new ForbiddenException("Credentials invalid");
 		}
 		
-		console.log(user.email)
+		// console.log(user.email)
 		// checking password
 		const passwordMatch = await argon.verify(user.hash, dto.password);
 
@@ -57,13 +64,14 @@ export class AuthService {
 			throw new ForbiddenException("Incorrect password");
 		}
 
-		return this.signToken(user.id, user.email);
+		return this.signToken(user.id, user.email, user.role);
 	}
 
-	async signToken(userId: number, email: string): Promise<{access_token: string}> {
+	async signToken(userId: number, email: string, role: Role): Promise<{access_token: string}> {
 		const payload = {
 			sub: userId,
-			email
+			email,
+			role,
 		};
 
 		const token = await this.jwt.signAsync(payload, {

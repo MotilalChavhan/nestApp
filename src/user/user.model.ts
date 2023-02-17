@@ -1,4 +1,6 @@
-import { Column, Model, Table, Unique } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Table, Unique } from 'sequelize-typescript';
+import { Post } from 'src/post/post.model';
+import { Role } from './enums';
 
 @Table
 export class User extends Model {
@@ -15,8 +17,14 @@ export class User extends Model {
   @Column
   lastName: string;
 
-  @Column({ defaultValue: true })
-  isActive: boolean;
+  @Column({
+    type: DataType.ENUM(Role.Admin, Role.User),
+    defaultValue: Role.User 
+  })
+  role: Role;
+
+  @HasMany(() => Post)
+  posts: Post[]
 
   toJSON() {
     return { ...this.get(), hash: undefined }
