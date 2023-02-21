@@ -44,6 +44,7 @@ export class AuthService {
 	}
 
 	async signin(dto: AuthDto) {
+		console.log(dto);
 		// get the user from the db
 		const user = await this.userModel.findOne({
 			where: {
